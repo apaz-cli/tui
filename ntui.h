@@ -20,7 +20,7 @@ typedef struct tuiwin_t tuiwin_t;
 LIST_DECLARE(tuiwin_t);
 struct tuiwin_t {
   tuiwin_t *parent;
-  ntuilist_tuiwin_t children;
+  list_tuiwin_t children;
 };
 LIST_DEFINE(tuiwin_t);
 
@@ -51,6 +51,12 @@ static inline ntui_t *ntui_init(ntui_t *tui) {
   mousemask(ALL_MOUSE_EVENTS | BUTTON_SHIFT | BUTTON_CTRL | BUTTON_ALT |
                 REPORT_MOUSE_POSITION,
             NULL);
+
+  // Ensure reporting mouse position works.
+  const char update_pos[] = "\033[?1003h\n";
+  printf("%s", update_pos);
+  fflush(stdout);
+
   return tui;
 }
 
