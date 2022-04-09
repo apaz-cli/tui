@@ -1,5 +1,5 @@
 #!/bin/sh
 
 clang test.c -lncurses -lpthread -g -Og -fsanitize=address -fsanitize=undefined
-./a.out
-rm a.out
+#./a.out
+#rm a.out

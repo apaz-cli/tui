@@ -1,65 +1,39 @@
 #ifndef NTUI_INCLUDE
 #define NTUI_INCLUDE
 
-#include <ncurses.h>
-#include <pthread.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#define NTUI_BACKEND_CURSES 1 // TODO Remove this
 
-#include "list.h"
+#ifndef NTUI_BACKEND_CURSES
+#define NTUI_BACKEND_CURSES 0
+#else
+#undef NTUI_BACKEND_CURSES
+#define NTUI_BACKEND_CURSES 1
+#endif
 
-/**************/
-/* Structures */
-/**************/
+#ifndef NTUI_BACKEND_WAYLAND
+#define NTUI_BACKEND_WAYLAND 0
+#else
+#undef NTUI_BACKEND_WAYLAND
+#define NTUI_BACKEND_WAYLAND 1
+#endif
 
-#define TYPE_DEFINE(name)
-struct tuiwin_t;
-typedef struct tuiwin_t tuiwin_t;
-LIST_DECLARE(tuiwin_t);
-struct tuiwin_t {
-  tuiwin_t *parent;
-  list_tuiwin_t children;
-};
-LIST_DEFINE(tuiwin_t);
+_Static_assert(
+    (NTUI_BACKEND_CURSES | NTUI_BACKEND_WAYLAND),
+    "A backend is required for ntui. Supports either wayland or ncurses.");
 
-typedef struct {
-  WINDOW *win;
-  tuiwin_t *root;
-} ntui_t;
+_Static_assert(!(NTUI_BACKEND_CURSES & NTUI_BACKEND_WAYLAND),
+               "Cannot enable both the ntui curses and wayland backends at the "
+               "same time.");
 
-/*******/
-/* API */
-/*******/
+static inline void ntui_init(void);
+static inline void ntui_render(void);
+static inline void ntui_input_loop(void);
+static inline void ntui_destroy(void);
 
-static inline ntui_t *ntui_init(ntui_t *tui) {
-
-  /* Initializen curses. */
-  tui->win = initscr();
-  tui->root = NULL;
-
-  /* Set up the tty to be taken over. */
-  raw();
-  keypad(stdscr, TRUE);
-  noecho();
-  cbreak();
-  clear();
-
-  /* Get absolutely everything as a mouse event.
-     Gather maximum information. */
-  mousemask(ALL_MOUSE_EVENTS | BUTTON_SHIFT | BUTTON_CTRL | BUTTON_ALT |
-                REPORT_MOUSE_POSITION,
-            NULL);
-
-  // Ensure reporting mouse position works.
-  const char update_pos[] = "\033[?1003h\n";
-  printf("%s", update_pos);
-  fflush(stdout);
-
-  return tui;
-}
-
-static inline void ntui_destroy(ntui_t *tui) { endwin(); }
+#if NTUI_BACKEND_CURSES
+#include "ntui_curses.h"
+#else
+#include "ntui_wayland.h"
+#endif
 
 #endif /* NTUI_INCLUDE */
