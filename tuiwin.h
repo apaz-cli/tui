@@ -24,7 +24,7 @@ typedef struct {
 static inline tuiwin_t *ntui_tuiwin_init(tuiwin_t *win, tuiwin_t *parent, int x,
                                          int y, int width, int height) {
   /* Initial initialization, about to be resized anyway. */
-  if (!parent & !x & !y & !width & !height) {
+  if (!parent) {
     win->parent = NULL;
     win->children = list_tuiwin_t_new();
     return win;
