@@ -2,19 +2,15 @@
 #define NTUI_CURSES_INCLUDE
 
 #include <ncurses.h>
-#include <signal.h>
 #include <sys/ioctl.h>
 
 #include "tuiwin.h"
 
 /* State */
-typedef struct sigaction sigaction_t;
 typedef struct {
   WINDOW *curses_window;
   tuiwin_t root_window;
   int lastx, lasty;
-  sigaction_t sigwinch_sigaction;
-  sigaction_t sigint_sigaction;
 } ntui_t;
 
 static ntui_t ntui;
