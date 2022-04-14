@@ -3,6 +3,7 @@
 
 #include <ncurses.h>
 #include <sys/ioctl.h>
+#include <unistd.h>
 
 #include "tuiwin.h"
 
@@ -33,20 +34,32 @@ static inline void ntui_init(void) {
   cbreak();
   clear();
 
+  /* Ensure reporting mouse position works. */
   mousemask(ALL_MOUSE_EVENTS | BUTTON_SHIFT | BUTTON_CTRL | BUTTON_ALT |
                 REPORT_MOUSE_POSITION,
             NULL);
-
-  /* Ensure reporting mouse position works. */
   const char update_pos[] = "\033[?1003h\n";
   printf("%s", update_pos);
   fflush(stdout);
 
+  /* Query terminal size. */
+  struct winsize ws;
+  ioctl(STDIN_FILENO, TIOCGWINSZ, &ws);
+
   /* Set up a the root window. */
-  ntui_tuiwin_init(&ntui.root_window, NULL, 0, 0, 0, 0);
+  ntui.root_window.x = 0;
+  ntui.root_window.y = 0;
+  ntui.root_window.width = ws.ws_col;
+  ntui.root_window.height = ws.ws_row;
+  ntui.root_window.parent = NULL;
+  ntui.root_window.main.children = list_tuiwin_t_new();
+  ntui.root_window.subclass = TUIWIN_MAINWIN;
+  
 }
 
-static inline void ntui_render(void) {}
+static inline void ntui_render(void) {
+  
+}
 
 static void ntui_input_loop() {
   int c, count = 0;
@@ -59,7 +72,8 @@ static void ntui_input_loop() {
       /* Mouse events bubble down. */
 
     } else if (c == KEY_RESIZE) {
-      /* Resizes bubble down, each window is in charge of re-rendering itself onto the canvas. */
+      /* Resizes bubble down, each window is in charge of re-rendering itself
+       * onto the canvas. */
       ntui_render();
     } else {
       /* Keypresses bubble up, not down. */
