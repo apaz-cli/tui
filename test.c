@@ -1,6 +1,36 @@
-#define NTUI_BACKEND_CURSES
 #include "ntui.h"
+#include "tmt.h"
 
+void tmt_cb(tmt_msg_t m, struct TMT *vt, const void *r, void *p) {
+  switch (m) {
+  case TMT_MSG_MOVED:
+    puts("MOVED");
+    break;
+  case TMT_MSG_UPDATE:
+    puts("UPDATE");
+    break;
+  case TMT_MSG_ANSWER:
+    puts("ANSWER");
+    break;
+  case TMT_MSG_BELL:
+    puts("BELL");
+    break;
+  case TMT_MSG_CURSOR:
+    puts("CURSOR");
+    break;
+  }
+  
+}
+
+int main(void) {
+  TMT *tmt = tmt_open(23, 80, tmt_cb, NULL, NULL);
+
+  const TMTPOINT* pt = tmt_cursor(tmt);
+  printf("(%zu, %zu)\n", pt->c, pt->r);
+  tmt_close(tmt);
+}
+
+/*
 int main(void) {
   ntui_init();
 
@@ -29,3 +59,4 @@ int main(void) {
 
   ntui_destroy();
 }
+*/
