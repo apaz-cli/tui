@@ -4,6 +4,7 @@
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <string.h>
 
 #include "list.h"
@@ -16,18 +17,47 @@
 #define TUIWIN_LRSPLITWIN 5
 #define TUIWIN_UBSPLITWIN 6
 
-typedef char *tuitextline_t;
-LIST_DECLARE(tuitextline_t);
-LIST_DEFINE(tuitextline_t);
+
+// TODO replace with UTF8 support.
+
+typedef int codepoint_t;
+
+typedef struct {
+  codepoint_t c;
+  uint8_t fgcolor;
+  uint8_t bgcolor;
+  struct {
+    bool bold : 1;
+    bool dim : 1;
+    bool underline : 1;
+    bool blink : 1;
+    bool reverse : 1;
+    bool invisible : 1;
+  } attrs;
+  bool dirty;
+} tuichar_t; // 64 bits on all sensible platforms.
+
+static inline tuichar_t tuichar_new(codepoint_t c) {
+  tuichar_t tc;
+  memset(&tc, 0, sizeof(tc));
+  tc.c = c;
+  return tc;
+}
+
+LIST_DECLARE(tuichar_t);
+LIST_DEFINE(tuichar_t);
+
+LIST_DECLARE(list_tuichar_t);
+LIST_DEFINE(list_tuichar_t);
+
+typedef list_tuichar_t tuitextline;
+typedef list_list_tuichar_t tuitextbuffer_t;
 
 /* Renders to fill the container. */
-typedef struct {
-  list_tuitextline_t lines;
-} tuitextbuffer_t;
 
 typedef struct {
-  char t, b, l, r;
-  char tl, tr, bl, br;
+  tuichar_t t, b, l, r;
+  tuichar_t tl, tr, bl, br;
 } tuiborder_t;
 
 struct tuiwin_t;
@@ -47,7 +77,7 @@ struct tuiwin_t {
     } main;
 
     struct {
-      tuitextbuffer_t *buffer;
+      tuitextbuffer_t buffer;
     } text;
 
     struct {
@@ -78,7 +108,7 @@ LIST_DEFINE(tuiwin_t);
 static inline tuiwin_t *textwin_init(tuiwin_t *win, tuiwin_t *parent, int x,
                                      int y, int width, int height) {
 
-  if ((!(win)) | (!(parent)) | (x < 0) | (y < 0) | (width < 0) | (height < 0)) {
+  if ((!win) | (!parent) | (x < 0) | (y < 0) | (width < 0) | (height < 0)) {
     ERROR("Invalid arguments to textwin_init().");
   }
   win->x = x;
@@ -87,7 +117,7 @@ static inline tuiwin_t *textwin_init(tuiwin_t *win, tuiwin_t *parent, int x,
   win->height = height;
   win->parent = parent;
   win->subclass = TUIWIN_TEXTWIN;
-  win->text.buffer->lines = list_tuitextline_t_new();
+  win->text.buffer = list_list_tuichar_t_new();
   
   return win;
 }
