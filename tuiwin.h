@@ -9,13 +9,13 @@
 
 #include "list.h"
 
-#define TUIWIN_EMPTYWIN 0
-#define TUIWIN_MAINWIN 1
-#define TUIWIN_TEXTWIN 2
-#define TUIWIN_IMAGEWIN 3
+#define TUIWIN_EMPTYWIN  0
+#define TUIWIN_CANVASWIN 1
+#define TUIWIN_TEXTWIN   2
+#define TUIWIN_IMAGEWIN  3
 #define TUIWIN_BORDERWIN 4
-#define TUIWIN_LRSPLITWIN 5
-#define TUIWIN_UBSPLITWIN 6
+#define TUIWIN_TERMWIN   5
+#define TUIWIN_SPLITWIN  6
 
 
 // TODO replace with UTF8 support.

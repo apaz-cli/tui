@@ -1,6 +1,7 @@
 #include <fcntl.h>
 #include <stdlib.h>
 
+// Returns 1 on error, returns 0 and writes master and slave file descriptors on succes.
 static inline int tui_pty_open(int* master_fd, int* slave_fd) {
     int masterfd, slavefd;
     char *slavedevice;
