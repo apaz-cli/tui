@@ -31,9 +31,9 @@ static inline void ntui_input_loop(void);
 static inline void ntui_destroy(void);
 
 #if NTUI_BACKEND_CURSES
-#include "ntui_curses.h"
+#include "tui_curses.h"
 #else
-#include "ntui_wayland.h"
+#include "tui_wayland.h"
 #endif
 
 #endif /* NTUI_INCLUDE */

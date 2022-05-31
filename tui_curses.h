@@ -53,7 +53,7 @@ static inline void ntui_init(void) {
   ntui.root_window.height = ws.ws_row;
   ntui.root_window.parent = NULL;
   ntui.root_window.main.children = list_tuiwin_t_new();
-  ntui.root_window.subclass = TUIWIN_MAINWIN;
+  ntui.root_window.subclass = TUIWIN_CANVASWIN;
   
 }
 
