@@ -1,0 +1,3 @@
+[submodule "libtmt"]
+	path = libtmt
+	url = https://github.com/Catgirls-With-Keyboards/libtmt.git
